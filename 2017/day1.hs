@@ -38,3 +38,17 @@ halfwayConsecutives input =
         items = map (\(x, index) -> (x, mod (index + increment) len)) $ zip digits [0..]
     in
         sum $ map fst $ filter (checkConsecutive digits) items
+
+
+-- Better solution:
+
+hasEqualContents :: Eq a => (a, a) -> Bool
+hasEqualContents (a, b) = a == b
+
+sumConsecutives' :: Integral a => Int -> [a] -> a
+sumConsecutives' offset digits =
+    sum $ map fst $ filter hasEqualContents $ zip digits $ drop offset $ cycle digits
+
+partOne = sumConsecutives' 1 . toDigits
+partTwo input = sumConsecutives' (div (length digits) 2) digits
+    where digits = toDigits input
