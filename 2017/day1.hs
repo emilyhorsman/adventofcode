@@ -42,12 +42,9 @@ halfwayConsecutives input =
 
 -- Better solution:
 
-hasEqualContents :: Eq a => (a, a) -> Bool
-hasEqualContents (a, b) = a == b
-
 sumConsecutives' :: Integral a => Int -> [a] -> a
 sumConsecutives' offset digits =
-    sum $ map fst $ filter hasEqualContents $ zip digits $ drop offset $ cycle digits
+    sum $ map fst $ filter (uncurry (==)) $ zip digits $ drop offset $ cycle digits
 
 partOne = sumConsecutives' 1 . toDigits
 partTwo input = sumConsecutives' (div (length digits) 2) digits
