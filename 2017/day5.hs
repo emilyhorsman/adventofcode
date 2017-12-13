@@ -1,24 +1,21 @@
-import Control.Lens
+import           Data.Vector.Unboxed         (fromList, thaw)
+import qualified Data.Vector.Unboxed.Mutable as M
 
 
 parse :: String -> [Int]
-parse = (map read) . lines
+parse = map read . lines
 
 
-compute :: Int -> Int -> [Int] -> Int
-compute pointer steps instructions =
-    let
-        target = pointer + instructions !! pointer
-        nextInstructions = (element pointer +~ 1) instructions
-        nextSteps = steps + 1
-     in
-        if target >= (length instructions) || target < 0 then nextSteps else compute target nextSteps nextInstructions
+compute pointer steps instructions = do
+    jump <- M.read instructions pointer
+    M.modify instructions (+ 1) pointer
+    let target = pointer + jump
+    let nextSteps = steps + 1
+    if target >= M.length instructions || target < 0 then return nextSteps else compute target nextSteps instructions
 
-
---solve :: FilePath -> IO Int
---solve path = (compute 0 0) . (parse <$> readFile path)
 
 main = do
     instructions <- parse <$> readFile "day5.1.input"
-    let s = compute 0 0 instructions
-    putStrLn (show s)
+    vector <- thaw $ fromList instructions
+    s <- compute 0 0 vector
+    print s
